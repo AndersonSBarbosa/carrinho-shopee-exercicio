@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrinho Shopee</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #ee4d2d;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Add product form */
+    .add-product {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-product h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .form-row input {
+      flex: 1;
+      min-width: 120px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .btn-add {
+      background-color: #ee4d2d;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-add:hover {
+      background-color: #d43f22;
+    }
+
+    /* Cart items */
+    .cart-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cart-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #333;
+    }
+
+    .cart-empty {
+      text-align: center;
+      color: #999;
+      padding: 30px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background-color: #f9f9f9;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      color: #555;
+      border-bottom: 2px solid #eee;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #eee;
+    }
+
+    tbody td {
+      padding: 12px;
+      font-size: 0.9rem;
+      color: #333;
+      vertical-align: middle;
+    }
+
+    .btn-remove {
+      background: none;
+      border: 1px solid #ee4d2d;
+      color: #ee4d2d;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .btn-remove:hover {
+      background-color: #ee4d2d;
+      color: #fff;
+    }
+
+    .cart-total {
+      text-align: right;
+      margin-top: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ee4d2d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛒 Carrinho Shopee</h1>
+
+    <div class="add-product">
+      <h2>Adicionar Produto</h2>
+      <div class="form-row">
+        <input type="text" id="productName" placeholder="Nome do produto" />
+        <input type="number" id="productPrice" placeholder="Preço (R$)" min="0" step="0.01" />
+        <input type="number" id="productQty" placeholder="Quantidade" min="1" value="1" />
+        <button class="btn-add" onclick="addItem()">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="cart-section">
+      <h2>Itens do Carrinho</h2>
+      <div id="cartContainer">
+        <p class="cart-empty">O carrinho está vazio.</p>
+      </div>
+      <div class="cart-total" id="cartTotal" style="display: none;">
+        Total: R$ <span id="totalValue">0,00</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
