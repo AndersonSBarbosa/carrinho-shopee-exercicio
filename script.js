@@ -16,16 +16,12 @@ const cart = {
     return item;
   },
 
-  // Remove an item by id and recalculate subtotals
+  // Remove an item by id
   removeItem(id) {
     const index = this.items.findIndex((item) => item.id === id);
     if (index !== -1) {
       this.items.splice(index, 1);
     }
-    // Recalculate subtotals for all remaining items
-    this.items.forEach((item) => {
-      item.subtotal = item.price * item.quantity;
-    });
   },
 
   // Calculate the total of all items
@@ -35,8 +31,13 @@ const cart = {
 };
 
 // Format a number as Brazilian currency (e.g. 1234.5 → "1.234,50")
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function formatCurrency(value) {
-  return value.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return currencyFormatter.format(value);
 }
 
 // Re-render the cart table and total
@@ -51,33 +52,42 @@ function renderCart() {
     return;
   }
 
-  let rows = "";
-  cart.items.forEach((item) => {
-    rows += `
-      <tr>
-        <td>${item.name}</td>
-        <td>R$ ${formatCurrency(item.price)}</td>
-        <td>${item.quantity}</td>
-        <td>R$ ${formatCurrency(item.subtotal)}</td>
-        <td>
-          <button class="btn-remove" onclick="removeItem(${item.id})">Remover</button>
-        </td>
-      </tr>`;
-  });
+  // Build table via DOM (avoids inline event handlers and XSS risks)
+  const table = document.createElement("table");
 
-  container.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Preço Unit.</th>
-          <th>Qtd</th>
-          <th>Subtotal</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>Produto</th>
+      <th>Preço Unit.</th>
+      <th>Qtd</th>
+      <th>Subtotal</th>
+      <th>Ação</th>
+    </tr>`;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  cart.items.forEach((item) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td>R$ ${formatCurrency(item.price)}</td>
+      <td>${item.quantity}</td>
+      <td>R$ ${formatCurrency(item.subtotal)}</td>
+      <td></td>`;
+
+    const btn = document.createElement("button");
+    btn.className = "btn-remove";
+    btn.textContent = "Remover";
+    btn.addEventListener("click", () => removeItem(item.id));
+    tr.querySelector("td:last-child").appendChild(btn);
+
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+
+  container.innerHTML = "";
+  container.appendChild(table);
 
   totalSpan.textContent = formatCurrency(cart.getTotal());
   totalDiv.style.display = "block";
@@ -120,3 +130,8 @@ function removeItem(id) {
   cart.removeItem(id);
   renderCart();
 }
+
+// Attach the addItem handler via addEventListener (avoids inline onclick in HTML)
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector(".btn-add").addEventListener("click", addItem);
+});
