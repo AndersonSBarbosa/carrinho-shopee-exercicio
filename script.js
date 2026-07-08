@@ -119,7 +119,8 @@ function addItem() {
 
   const name = nameInput.value.trim();
   const price = parseFloat(priceInput.value);
-  const quantity = parseInt(qtyInput.value, 10);
+  const qtyRaw = qtyInput.value;
+  const quantity = parseInt(qtyRaw, 10);
 
   if (!name) {
     alert("Por favor, informe o nome do produto.");
@@ -129,7 +130,7 @@ function addItem() {
     alert("Por favor, informe um preço válido.");
     return;
   }
-  if (isNaN(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+  if (isNaN(quantity) || quantity <= 0 || qtyRaw.includes(".") || qtyRaw.includes(",")) {
     alert("Por favor, informe uma quantidade válida (número inteiro positivo).");
     return;
   }
