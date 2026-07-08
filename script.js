@@ -32,10 +32,10 @@ const cart = {
 
 const EMPTY_CART_MESSAGE = "O carrinho está vazio.";
 
-// Format a number as Brazilian currency (e.g. 1234.5 → "1.234,50")
+// Format a value as Brazilian currency (e.g. 1234.5 → "R$ 1.234,50")
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  style: "currency",
+  currency: "BRL",
 });
 
 function formatCurrency(value) {
@@ -49,6 +49,11 @@ function createTextCell(text) {
   return td;
 }
 
+// Helper to clear all children from a DOM element
+function clearChildren(el) {
+  el.replaceChildren();
+}
+
 // Re-render the cart table and total
 function renderCart() {
   const container = document.getElementById("cartContainer");
@@ -59,7 +64,7 @@ function renderCart() {
     const p = document.createElement("p");
     p.className = "cart-empty";
     p.textContent = EMPTY_CART_MESSAGE;
-    container.innerHTML = "";
+    clearChildren(container);
     container.appendChild(p);
     totalDiv.style.display = "none";
     return;
@@ -69,14 +74,13 @@ function renderCart() {
   const table = document.createElement("table");
 
   const thead = document.createElement("thead");
-  thead.innerHTML = `
-    <tr>
-      <th>Produto</th>
-      <th>Preço Unit.</th>
-      <th>Qtd</th>
-      <th>Subtotal</th>
-      <th>Ação</th>
-    </tr>`;
+  const headerRow = document.createElement("tr");
+  ["Produto", "Preço Unit.", "Qtd", "Subtotal", "Ação"].forEach((label) => {
+    const th = document.createElement("th");
+    th.textContent = label;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
@@ -84,9 +88,9 @@ function renderCart() {
     const tr = document.createElement("tr");
 
     tr.appendChild(createTextCell(item.name));
-    tr.appendChild(createTextCell("R$ " + formatCurrency(item.price)));
+    tr.appendChild(createTextCell(formatCurrency(item.price)));
     tr.appendChild(createTextCell(String(item.quantity)));
-    tr.appendChild(createTextCell("R$ " + formatCurrency(item.subtotal)));
+    tr.appendChild(createTextCell(formatCurrency(item.subtotal)));
 
     const actionTd = document.createElement("td");
     const btn = document.createElement("button");
@@ -100,7 +104,7 @@ function renderCart() {
   });
   table.appendChild(tbody);
 
-  container.innerHTML = "";
+  clearChildren(container);
   container.appendChild(table);
 
   totalSpan.textContent = formatCurrency(cart.getTotal());
