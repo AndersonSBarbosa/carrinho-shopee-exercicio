@@ -30,6 +30,8 @@ const cart = {
   },
 };
 
+const EMPTY_CART_MESSAGE = "O carrinho está vazio.";
+
 // Format a number as Brazilian currency (e.g. 1234.5 → "1.234,50")
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
@@ -40,6 +42,13 @@ function formatCurrency(value) {
   return currencyFormatter.format(value);
 }
 
+// Helper to create a text-only <td> (prevents XSS from user-supplied values)
+function createTextCell(text) {
+  const td = document.createElement("td");
+  td.textContent = text;
+  return td;
+}
+
 // Re-render the cart table and total
 function renderCart() {
   const container = document.getElementById("cartContainer");
@@ -47,7 +56,11 @@ function renderCart() {
   const totalSpan = document.getElementById("totalValue");
 
   if (cart.items.length === 0) {
-    container.innerHTML = '<p class="cart-empty">O carrinho está vazio.</p>';
+    const p = document.createElement("p");
+    p.className = "cart-empty";
+    p.textContent = EMPTY_CART_MESSAGE;
+    container.innerHTML = "";
+    container.appendChild(p);
     totalDiv.style.display = "none";
     return;
   }
@@ -69,18 +82,19 @@ function renderCart() {
   const tbody = document.createElement("tbody");
   cart.items.forEach((item) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${item.name}</td>
-      <td>R$ ${formatCurrency(item.price)}</td>
-      <td>${item.quantity}</td>
-      <td>R$ ${formatCurrency(item.subtotal)}</td>
-      <td></td>`;
 
+    tr.appendChild(createTextCell(item.name));
+    tr.appendChild(createTextCell("R$ " + formatCurrency(item.price)));
+    tr.appendChild(createTextCell(String(item.quantity)));
+    tr.appendChild(createTextCell("R$ " + formatCurrency(item.subtotal)));
+
+    const actionTd = document.createElement("td");
     const btn = document.createElement("button");
     btn.className = "btn-remove";
     btn.textContent = "Remover";
     btn.addEventListener("click", () => removeItem(item.id));
-    tr.querySelector("td:last-child").appendChild(btn);
+    actionTd.appendChild(btn);
+    tr.appendChild(actionTd);
 
     tbody.appendChild(tr);
   });
@@ -134,4 +148,11 @@ function removeItem(id) {
 // Attach the addItem handler via addEventListener (avoids inline onclick in HTML)
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".btn-add").addEventListener("click", addItem);
+
+  // Allow pressing Enter in any input field to trigger addItem
+  ["productName", "productPrice", "productQty"].forEach((id) => {
+    document.getElementById(id).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addItem();
+    });
+  });
 });
