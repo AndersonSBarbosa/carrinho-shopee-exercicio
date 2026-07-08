@@ -129,8 +129,8 @@ function addItem() {
     alert("Por favor, informe um preço válido.");
     return;
   }
-  if (isNaN(quantity) || quantity <= 0) {
-    alert("Por favor, informe uma quantidade válida.");
+  if (isNaN(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+    alert("Por favor, informe uma quantidade válida (número inteiro positivo).");
     return;
   }
 
