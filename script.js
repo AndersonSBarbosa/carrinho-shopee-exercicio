@@ -151,12 +151,18 @@ function removeItem(id) {
 
 // Attach the addItem handler via addEventListener (avoids inline onclick in HTML)
 document.addEventListener("DOMContentLoaded", () => {
+  // Render the initial (empty) cart state
+  renderCart();
+
   document.querySelector(".btn-add").addEventListener("click", addItem);
 
   // Allow pressing Enter in any input field to trigger addItem
   ["productName", "productPrice", "productQty"].forEach((id) => {
     document.getElementById(id).addEventListener("keydown", (e) => {
-      if (e.key === "Enter") addItem();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addItem();
+      }
     });
   });
 });
